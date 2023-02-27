@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         // Minimum periodic time is 15 minute and retry time is 10 Second
         val worker = PeriodicWorkRequestBuilder<PushEventWorker>(15, TimeUnit.MINUTES)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
-            .setInitialDelay(5,TimeUnit.SECONDS)
+            .setInitialDelay(5, TimeUnit.SECONDS)
             .setConstraints(constraints)
             .build()
         val workManager = WorkManager.getInstance(this.applicationContext)
@@ -78,24 +78,7 @@ class MainActivity : AppCompatActivity() {
         workManager.getWorkInfoByIdLiveData(worker.id)
             .observe(this) {
                 Log.d(TAG, "startWorker: ${it.state}")
-                when (it.state) {
-                    WorkInfo.State.ENQUEUED -> {
-                        val totalPushedEvent = it.outputData.getInt(PushEventWorker.DATA_TOTAL_EVENT,0)
-                        runOnUiThread {
-                            Toast.makeText(this@MainActivity, "Worker Enqueue push data to Server : $totalPushedEvent Events", Toast.LENGTH_SHORT).show()
-                        }
-                        viewModel.refreshEvent()
-                    }
-                    WorkInfo.State.RUNNING -> {
-                        runOnUiThread {
-                            Toast.makeText(this@MainActivity, "Worker Running", Toast.LENGTH_SHORT).show()
-                        }
-                        viewModel.refreshEvent()
-                    }
-                    else -> {
-                        viewModel.refreshEvent()
-                    }
-                }
+                viewModel.refreshEvent()
             }
     }
 }
